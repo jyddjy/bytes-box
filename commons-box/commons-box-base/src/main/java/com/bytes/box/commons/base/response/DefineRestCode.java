@@ -7,7 +7,7 @@ public interface DefineRestCode {
     Pair<String, String> getPair();
 
     @lombok.Builder
-    class NewRestCode implements com.bytes.bfs.support.commons.box.base.response.DefineRestCode {
+    class NewRestCode implements DefineRestCode {
 
         private String code;
 
