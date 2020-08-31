@@ -3,12 +3,13 @@ package com.bytes.box.commons.web.mvc.resolve;
 import cn.hutool.crypto.asymmetric.KeyType;
 import cn.hutool.crypto.asymmetric.RSA;
 import com.alibaba.fastjson.JSONObject;
+import com.bytes.box.commons.base.Keys;
 import com.bytes.box.commons.base.annocation.EncryptIgnore;
 import com.bytes.box.commons.base.encrypt.ApplicationEncryptContext;
 import com.bytes.box.commons.base.encrypt.RequestHeaderContext;
 import com.bytes.box.commons.base.encrypt.RsaCacheContext;
 import com.bytes.box.commons.base.properties.EncryptProperties;
-import com.bytes.box.commons.base.response.RestCode;
+import com.bytes.box.commons.base.response.DefaultException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -36,6 +37,9 @@ import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
+import static com.bytes.box.commons.base.response.RestCode.REQ_PARAM_ENCRYPT_ERROR;
+import static com.bytes.box.commons.base.response.RestCode.RESP_PARAM_ENCRYPT_ERROR;
+
 @Slf4j
 @Import(value = {
         RsaCacheContext.class,
@@ -45,13 +49,11 @@ import java.util.Objects;
 )
 public class ClientBodyResolve {
 
-    public static final String CLIENT_BODY_HEADER_KEY = "encrypt-ctx";
-
     /**
      * request body handler
      */
     @ControllerAdvice
-    @Order(0)
+    @Order
     static class RequestClientBodyResolve implements RequestBodyAdvice {
 
         private final ApplicationEncryptContext applicationEncryptContext;
@@ -77,7 +79,7 @@ public class ClientBodyResolve {
             EncryptProperties encryptProperties = applicationEncryptContext.getEncryptProperties();
             RsaCacheContext rsaCacheContext = applicationEncryptContext.getRsaCacheContext();
 
-            RequestHeaderContext requestBoxContext = RequestHeaderContext.getRequestHeaderContext(inputMessage.getHeaders().getFirst(CLIENT_BODY_HEADER_KEY));
+            RequestHeaderContext requestBoxContext = RequestHeaderContext.getRequestHeaderContext(inputMessage.getHeaders().getFirst(Keys.CLIENT_BODY_HEADER_KEY));
 
             log.info("[request] requestContext={} & serverIgnore={}", requestBoxContext, encryptProperties.getIgnore());
             if ((Objects.isNull(requestBoxContext) || BooleanUtils.isTrue(requestBoxContext.getReqIgnore()))
@@ -90,7 +92,7 @@ public class ClientBodyResolve {
                 String encryptBody = rsa.decryptStr(body, KeyType.PublicKey);
                 return HttpBodyMessage.builder().body(encryptBody).httpHeaders(inputMessage.getHeaders()).build();
             } catch (Exception e) {
-                throw RestCode.REQ_PARAM_ENCRYPT_ERROR.fetchException();
+                throw new DefaultException(REQ_PARAM_ENCRYPT_ERROR);
             }
         }
 
@@ -130,7 +132,7 @@ public class ClientBodyResolve {
      * response body handler
      */
     @ControllerAdvice
-    @Order(0)
+    @Order
     static class ResponseClientBodyResolve implements ResponseBodyAdvice<Object> {
 
         private final ApplicationEncryptContext applicationEncryptContext;
@@ -156,10 +158,15 @@ public class ClientBodyResolve {
                 return null;
             }
 
+            String respException = response.getHeaders().getFirst(WebMvcExceptionResolve.ExceptionResolve.RESP_EXCEPTION);
+            if (StringUtils.isNotBlank(respException)) {
+                return object;
+            }
+            
             EncryptProperties encryptProperties = applicationEncryptContext.getEncryptProperties();
             RsaCacheContext rsaCacheContext = applicationEncryptContext.getRsaCacheContext();
 
-            RequestHeaderContext requestBoxContext = RequestHeaderContext.getRequestHeaderContext(request.getHeaders().getFirst(CLIENT_BODY_HEADER_KEY));
+            RequestHeaderContext requestBoxContext = RequestHeaderContext.getRequestHeaderContext(request.getHeaders().getFirst(Keys.CLIENT_BODY_HEADER_KEY));
             log.info("[response] requestContext={} & serverIgnore={}", requestBoxContext, encryptProperties.getIgnore());
             if ((Objects.isNull(requestBoxContext) || BooleanUtils.isTrue(requestBoxContext.getRespIgnore()))
                     && BooleanUtils.isTrue(encryptProperties.getIgnore())) {
@@ -171,7 +178,7 @@ public class ClientBodyResolve {
                 final String responseBody = JSONObject.toJSONString(object);
                 return rsa.encryptBase64(responseBody, KeyType.PublicKey);
             } catch (Exception e) {
-                throw RestCode.RESP_PARAM_ENCRYPT_ERROR.fetchException();
+                throw new DefaultException(RESP_PARAM_ENCRYPT_ERROR);
             }
         }
     }

@@ -1,4 +1,4 @@
-package com.bytes.box.commons.web.mvc.hystrix;
+package com.bytes.box.commons.base.hystrix;
 
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;

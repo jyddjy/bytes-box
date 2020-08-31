@@ -15,9 +15,5 @@ import java.lang.annotation.*;
 @Import(value = BoxImportSelector.class)
 public @interface EnableBox {
 
-    boolean encrypt() default false;
-
-    boolean feignEncrypt() default false;
-
     Class<?>[] imports() default {};
 }

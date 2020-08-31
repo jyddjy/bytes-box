@@ -42,9 +42,16 @@ import javax.validation.Path;
 @Import(value = {WebMvcExceptionResolve.ExceptionResolve.class})
 public class WebMvcExceptionResolve {
 
+
     @ControllerAdvice
     @Order(-1)
     public static class ExceptionResolve implements EnvironmentAware {
+
+        public static final String RESP_EXCEPTION = "RESP-EXCEPTION";
+
+        public ExceptionResolve() {
+            log.info("init web mvc exception resolve...");
+        }
 
         private Environment environment;
 
@@ -52,8 +59,10 @@ public class WebMvcExceptionResolve {
             return environment.getProperty("spring.application.name");
         }
 
-        private RestResponse fetch(DefineRestCode defineRestCode, HttpServletRequest request, HttpServletResponse response) {
+        private RestResponse fetch(DefineRestCode defineRestCode, HttpServletRequest request, HttpServletResponse response, Exception e) {
             Pair<String, String> pair = defineRestCode.getPair();
+            response.setHeader(RESP_EXCEPTION, RESP_EXCEPTION);
+            log.error("exception: ", e);
             return RestResponse.error(pair.getKey(), pair.getValue(), request.getServletPath(), getService());
         }
 
@@ -63,7 +72,7 @@ public class WebMvcExceptionResolve {
         public RestResponse businessExceptionHandler(HttpServletRequest request,
                                                      HttpServletResponse response,
                                                      DefaultException e) {
-            return fetch(RestCode.ERROR, request, response);
+            return fetch(RestCode.ERROR, request, response, e);
         }
 
         @ExceptionHandler(Exception.class)
@@ -72,7 +81,7 @@ public class WebMvcExceptionResolve {
         public RestResponse defaultExceptionHandler(HttpServletRequest request,
                                                     HttpServletResponse response,
                                                     Exception e) {
-            return fetch(RestCode.ERROR, request, response);
+            return fetch(RestCode.ERROR, request, response, e);
         }
 
         @ExceptionHandler(IllegalArgumentException.class)
@@ -84,7 +93,7 @@ public class WebMvcExceptionResolve {
             String errorMsg = Strings.isNullOrEmpty(e.getMessage()) ? "参数错误" : e.getMessage();
             DefineRestCode.NewRestCode restCode =
                     DefineRestCode.NewRestCode.builder().code(RestCode.ERROR.getCode()).message(errorMsg).build();
-            return fetch(restCode, request, response);
+            return fetch(restCode, request, response, e);
         }
 
         //不支持的请求方法. 例如要求的是Post请求. 调用者发起的是Get请求
@@ -100,7 +109,7 @@ public class WebMvcExceptionResolve {
                             .code(RestCode.METHOD_NOT_ALLOWED.getCode())
                             .message("不支持" + e.getMethod() + "请求").build();
 
-            return fetch(restCode, request, response);
+            return fetch(restCode, request, response, e);
         }
 
         //不支持的mediaType, 如请求期望的是@ReqeustBody. 但是传入的Context-Type是text/plain
@@ -116,7 +125,7 @@ public class WebMvcExceptionResolve {
                             .code(RestCode.UNSUPPORTED_MEDIA_TYPE.getCode())
                             .message("不支持Type为 " + e.getContentType() + " 的请求").build();
 
-            return fetch(restCode, request, response);
+            return fetch(restCode, request, response, e);
         }
 
         //404 请求path无效
@@ -124,9 +133,9 @@ public class WebMvcExceptionResolve {
         @ResponseBody
         //@ResponseStatus(HttpStatus.NOT_FOUND)
         public RestResponse noHandlerExceptionHandler(HttpServletRequest request,
-                                                      HttpServletResponse response) {
+                                                      HttpServletResponse response, NoHandlerFoundException e) {
             //不打印日志. 经常有访问首页的请求
-            return fetch(RestCode.NOT_FOUND, request, response);
+            return fetch(RestCode.NOT_FOUND, request, response, e);
         }
 
         //请求body转换错误, JSONObject.parse参数类型失败
@@ -142,7 +151,7 @@ public class WebMvcExceptionResolve {
                             .code(RestCode.BAD_REQUEST.getCode())
                             .message("请求无效, 参数错误").build();
 
-            return fetch(restCode, request, response);
+            return fetch(restCode, request, response, e);
         }
 
         //LocalDateTime类型错误
@@ -158,7 +167,7 @@ public class WebMvcExceptionResolve {
                             .code(RestCode.BAD_REQUEST.getCode())
                             .message("请求无效, 参数类型错误").build();
 
-            return fetch(restCode, request, response);
+            return fetch(restCode, request, response, e);
         }
 
         //包装类型参数缺失
@@ -178,7 +187,7 @@ public class WebMvcExceptionResolve {
                             .code(RestCode.BAD_REQUEST.getCode())
                             .message(errorMsg).build();
 
-            return fetch(restCode, request, response);
+            return fetch(restCode, request, response, e);
         }
 
         private String buildPrettyMessage(String message) {
@@ -215,7 +224,7 @@ public class WebMvcExceptionResolve {
                 restCodeBuilder.message(errorMsg);
             }
 
-            return fetch(restCodeBuilder.build(), request, response);
+            return fetch(restCodeBuilder.build(), request, response, e);
         }
 
         //包装类型参数绑定失败
@@ -230,7 +239,7 @@ public class WebMvcExceptionResolve {
                             .code(RestCode.BAD_REQUEST.getCode())
                             .message(String.format("参数类型错误, 参数名: %s", e.getName())).build();
 
-            return fetch(restCode, request, response);
+            return fetch(restCode, request, response, e);
         }
 
         //包装类型参数校验失败
@@ -251,7 +260,7 @@ public class WebMvcExceptionResolve {
                             .code(RestCode.BAD_REQUEST.getCode())
                             .message(errorMsg).build();
 
-            return fetch(restCode, request, response);
+            return fetch(restCode, request, response, e);
         }
 
         /**
@@ -275,7 +284,7 @@ public class WebMvcExceptionResolve {
                             .code(RestCode.BAD_REQUEST.getCode())
                             .message(errorMsg).build();
 
-            return fetch(restCode, request, response);
+            return fetch(restCode, request, response, e);
         }
 
         @Override

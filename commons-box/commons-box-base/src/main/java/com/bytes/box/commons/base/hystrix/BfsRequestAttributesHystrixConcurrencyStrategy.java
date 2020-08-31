@@ -1,4 +1,4 @@
-package com.bytes.box.commons.web.mvc.hystrix;
+package com.bytes.box.commons.base.hystrix;
 
 import com.netflix.hystrix.HystrixThreadPoolKey;
 import com.netflix.hystrix.HystrixThreadPoolProperties;

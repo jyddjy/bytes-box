@@ -1,11 +1,12 @@
-package com.bytes.box.commons.web.mvc.resolve;
+package com.bytes.box.commons.base.resolve;
 
 import cn.hutool.crypto.asymmetric.KeyType;
 import cn.hutool.crypto.asymmetric.RSA;
+import com.bytes.box.commons.base.Keys;
 import com.bytes.box.commons.base.encrypt.ApplicationEncryptContext;
 import com.bytes.box.commons.base.encrypt.RequestHeaderContext;
 import com.bytes.box.commons.base.encrypt.RsaCacheContext;
-import com.bytes.box.commons.web.mvc.hystrix.BfsRequestAttributesHystrixConcurrencyStrategy;
+import com.bytes.box.commons.base.hystrix.BfsRequestAttributesHystrixConcurrencyStrategy;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import feign.Client;
@@ -27,7 +28,6 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Map;
 
-import static com.bytes.box.commons.web.mvc.resolve.ClientBodyResolve.CLIENT_BODY_HEADER_KEY;
 
 /**
  * 代理默认得client设置，可以重写默认得client，设置对应得属性信息
@@ -107,7 +107,7 @@ public class FeignClientBodyResolve {
                     .build();
 
             Map<String, Collection<String>> headers = Maps.newHashMap(request.headers());
-            headers.put(CLIENT_BODY_HEADER_KEY, ImmutableList.of(requestHeaderContext.toJson()));
+            headers.put(Keys.CLIENT_BODY_HEADER_KEY, ImmutableList.of(requestHeaderContext.toJson()));
 
             Request newRequest = Request.create(request.httpMethod(), request.url(), headers,
                     Request.Body.bodyTemplate(encryptBase64, StandardCharsets.UTF_8)
