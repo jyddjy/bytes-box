@@ -1,8 +1,5 @@
 package com.bytes.box.commons.web.mvc.config;
 
-import com.alibaba.fastjson.parser.ParserConfig;
-import com.alibaba.fastjson.parser.deserializer.Jdk8DateCodec;
-import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import com.bytes.box.commons.base.utils.FastJsonUtils;
@@ -14,43 +11,15 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
 
 @Slf4j
 public class DefaultWebMvcConfig extends WebMvcConfigurationSupport {
 
-    void init() {
-
-        SerializeConfig.getGlobalInstance().put(LocalDateTime.class, (serializer, object, fieldName, fieldType, features) -> {
-            if (object == null) {
-                serializer.out.writeNull();
-                return;
-            }
-            long value = ((LocalDateTime) object).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-            serializer.out.writeLong(value);
-        });
-
-        SerializeConfig.getGlobalInstance().put(LocalDate.class, (serializer, object, fieldName, fieldType, features) -> {
-            if (object == null) {
-                serializer.out.writeNull();
-                return;
-            }
-            long value = ((LocalDate) object).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
-            serializer.out.writeLong(value);
-        });
-
-        ParserConfig.getGlobalInstance().putDeserializer(LocalDateTime.class, Jdk8DateCodec.instance);
-        // https://baijiahao.baidu.com/s?id=1671603044044877345&wfr=spider&for=pc
-        ParserConfig.getGlobalInstance().setSafeMode(true);
-
-    }
-
     @Override
     public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-        init();
+        
+        FastJsonUtils.init();
         super.extendMessageConverters(converters);
     }
 
