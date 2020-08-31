@@ -6,9 +6,9 @@
 
     <artifactId>commons-box</artifactId>
     <packaging>pom</packaging>
+
     <modules>
         <module>commons-box-base</module>
-        <module>commons-box-dependencies</module>
         <module>commons-box-webmvc</module>
         <module>commons-box-webflux</module>
     </modules>
@@ -18,5 +18,28 @@
         <groupId>com.bytes.bfs</groupId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
+
+    <dependencyManagement>
+
+        <dependencies>
+            <dependency>
+                <groupId>com.bytes.bfs</groupId>
+                <artifactId>commons-box-base</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.bytes.bfs</groupId>
+                <artifactId>commons-box-webmvc</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.bytes.bfs</groupId>
+                <artifactId>commons-box-webflux</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 </project>

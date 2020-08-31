@@ -11,5 +11,13 @@
 
     <artifactId>commons-box-webmvc</artifactId>
 
+    <dependencies>
+
+        <dependency>
+            <groupId>com.bytes.bfs</groupId>
+            <artifactId>commons-box-base</artifactId>
+        </dependency>
+
+    </dependencies>
 
 </project>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds" debug="true">
+
+    <property name="DefaultPattern"
+              value="[%d{yyyy-MM-dd HH:mm:ss.SSS}][%level][%thread][%logger{40}:%line][%X{TraceId}]: %msg%n"/>
+    <property name="ColorfulPattern"
+              value="[%d{yyyy-MM-dd HH:mm:ss.SSS}][%highlight(%level)][%thread][%yellow(%replace(%caller{1}){'\n|Caller.{4}|\r\n', ''})][%X{TraceId}]:%msg%n%throwable"/>
+
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <Pattern>
+                ${DefaultPattern}
+            </Pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ColorfulConsole" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <Pattern>
+                ${ColorfulPattern}
+            </Pattern>
+        </encoder>
+    </appender>
+
+    <!-- 生产环境 -->
+    <springProfile name="prod">
+        <root level="info">
+            <appender-ref ref="Console"/>
+        </root>
+    </springProfile>
+    <springProfile name="qa">
+        <root level="info">
+            <appender-ref ref="Console"/>
+        </root>
+        <logger name="com.bytes" level="debug" additivity="false">
+            <appender-ref ref="Console"/>
+        </logger>
+    </springProfile>
+    <springProfile name="dev">
+        <root level="info">
+            <appender-ref ref="Console"/>
+        </root>
+        <logger name="com.bytes" level="debug" additivity="false">
+            <appender-ref ref="Console"/>
+        </logger>
+    </springProfile>
+    <springProfile name="unittest">
+        <root level="warn">
+            <appender-ref ref="ColorfulConsole"/>
+        </root>
+        <logger name="com.bytes" level="debug" additivity="false">
+            <appender-ref ref="ColorfulConsole"/>
+        </logger>
+    </springProfile>
+    <springProfile name="local">
+        <root level="info">
+            <appender-ref ref="ColorfulConsole"/>
+        </root>
+        <logger name="com.bytes" level="debug" additivity="false">
+            <appender-ref ref="ColorfulConsole"/>
+        </logger>
+    </springProfile>
+
+</configuration>
