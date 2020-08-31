@@ -1,11 +1,7 @@
 package com.bytes.box.commons.base;
 
-import com.bytes.bfs.support.common.box.annocation.EnableBox;
-import com.bytes.bfs.support.common.box.encrypt.resolve.ClientBodyResolve;
-import com.bytes.bfs.support.common.box.encrypt.resolve.FeignClientBodyResolve;
-import com.google.common.collect.ImmutableList;
+import com.bytes.box.commons.base.annocation.EnableBox;
 import com.google.common.collect.Lists;
-import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.context.annotation.ImportSelector;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotationMetadata;
@@ -23,14 +19,6 @@ public class BoxImportSelector implements ImportSelector {
                 .fromMap(annotationMetadata.getAnnotationAttributes(EnableBox.class.getName()));
 
         List<Class<?>> imports = Lists.newArrayList();
-
-        if (BooleanUtils.isTrue(attributes.getBoolean("encrypt"))) {
-            imports.addAll(ImmutableList.of(ClientBodyResolve.class));
-        }
-
-        if (BooleanUtils.isTrue(attributes.getBoolean("feignEncrypt"))) {
-            imports.addAll(ImmutableList.of(FeignClientBodyResolve.class));
-        }
 
         imports.addAll(Arrays.asList(attributes.getClassArray("imports")));
 

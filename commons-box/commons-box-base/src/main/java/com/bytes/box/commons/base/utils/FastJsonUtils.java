@@ -2,6 +2,8 @@ package com.bytes.box.commons.base.utils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.parser.ParserConfig;
+import com.alibaba.fastjson.parser.deserializer.Jdk8DateCodec;
 import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.serializer.SerializeFilter;
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -11,6 +13,7 @@ import com.google.common.collect.Lists;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
@@ -75,4 +78,34 @@ public class FastJsonUtils {
         PRETTY_FORMAT_CONFIG = buildPrettyConfig(true);
         PRETTY_LOG_CONFIG = buildPrettyConfig(false);
     }
+
+    /**
+     * 初始设置信息
+     */
+    public static void init() {
+
+        SerializeConfig.getGlobalInstance().put(LocalDateTime.class, (serializer, object, fieldName, fieldType, features) -> {
+            if (object == null) {
+                serializer.out.writeNull();
+                return;
+            }
+            long value = ((LocalDateTime) object).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+            serializer.out.writeLong(value);
+        });
+
+        SerializeConfig.getGlobalInstance().put(LocalDate.class, (serializer, object, fieldName, fieldType, features) -> {
+            if (object == null) {
+                serializer.out.writeNull();
+                return;
+            }
+            long value = ((LocalDate) object).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+            serializer.out.writeLong(value);
+        });
+
+        ParserConfig.getGlobalInstance().putDeserializer(LocalDateTime.class, Jdk8DateCodec.instance);
+        // https://baijiahao.baidu.com/s?id=1671603044044877345&wfr=spider&for=pc
+        ParserConfig.getGlobalInstance().setSafeMode(true);
+    }
+
+
 }
