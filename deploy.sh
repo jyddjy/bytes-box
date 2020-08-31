@@ -1,0 +1,1 @@
+mvn clean install deploy -am -U -DskipTests -pl $1 $2
