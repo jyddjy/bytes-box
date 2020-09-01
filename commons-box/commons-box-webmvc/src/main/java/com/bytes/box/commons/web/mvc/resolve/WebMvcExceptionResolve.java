@@ -1,6 +1,5 @@
 package com.bytes.box.commons.web.mvc.resolve;
 
-import com.bytes.box.commons.base.annocation.EnableBox;
 import com.bytes.box.commons.base.response.DefaultException;
 import com.bytes.box.commons.base.response.DefineRestCode;
 import com.bytes.box.commons.base.response.RestCode;

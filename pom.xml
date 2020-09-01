@@ -6,6 +6,8 @@
     <modules>
         <module>commons-box</module>
         <module>bytes-box-dependencies</module>
+        <module>orm-box</module>
+        <module>event-box</module>
     </modules>
 
     <parent>
