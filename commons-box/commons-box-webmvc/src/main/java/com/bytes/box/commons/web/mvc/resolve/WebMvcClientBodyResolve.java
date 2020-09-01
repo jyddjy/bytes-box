@@ -44,10 +44,10 @@ import static com.bytes.box.commons.base.response.RestCode.RESP_PARAM_ENCRYPT_ER
 @Import(value = {
         RsaCacheContext.class,
         ApplicationEncryptContext.class,
-        ClientBodyResolve.RequestClientBodyResolve.class,
-        ClientBodyResolve.ResponseClientBodyResolve.class}
+        WebMvcClientBodyResolve.RequestClientBodyResolve.class,
+        WebMvcClientBodyResolve.ResponseClientBodyResolve.class}
 )
-public class ClientBodyResolve {
+public class WebMvcClientBodyResolve {
 
     /**
      * request body handler
@@ -162,7 +162,7 @@ public class ClientBodyResolve {
             if (StringUtils.isNotBlank(respException)) {
                 return object;
             }
-            
+
             EncryptProperties encryptProperties = applicationEncryptContext.getEncryptProperties();
             RsaCacheContext rsaCacheContext = applicationEncryptContext.getRsaCacheContext();
 

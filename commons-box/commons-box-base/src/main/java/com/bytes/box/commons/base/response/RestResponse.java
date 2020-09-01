@@ -54,13 +54,13 @@ public class RestResponse<T> implements Serializable {
     public static RestResponse error(String code, String message, String path, String service) {
         return builder()
                 .code(code).message(message)
+                .data(null)
                 .path(path).service(service).build();
     }
 
     public static <T> RestResponse error(RestCode restCode) {
         return of(restCode, null);
     }
-
 
     public static <T> RestResponse of(RestCode restCode, T data) {
         return builder()
