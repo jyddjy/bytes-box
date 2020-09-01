@@ -9,6 +9,7 @@ import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.context.EnvironmentAware;
@@ -63,7 +64,7 @@ public class WebMvcExceptionResolve {
             Pair<String, String> pair = defineRestCode.getPair();
             response.setHeader(RESP_EXCEPTION, RESP_EXCEPTION);
             log.error("exception: ", e);
-            return RestResponse.error(pair.getKey(), pair.getValue(), request.getServletPath(), getService());
+            return RestResponse.error(pair.getKey(), StringUtils.firstNonBlank(pair.getValue(), ExceptionUtils.getMessage(e)), request.getServletPath(), getService());
         }
 
         @ExceptionHandler(DefaultException.class)
@@ -72,7 +73,7 @@ public class WebMvcExceptionResolve {
         public RestResponse businessExceptionHandler(HttpServletRequest request,
                                                      HttpServletResponse response,
                                                      DefaultException e) {
-            return fetch(RestCode.ERROR, request, response, e);
+            return fetch(e.getRestCode(), request, response, e);
         }
 
         @ExceptionHandler(Exception.class)

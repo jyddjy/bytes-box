@@ -24,9 +24,9 @@ public enum RestCode implements DefineRestCode {
 
     UNSUPPORTED_MEDIA_TYPE("415", "不支持 Media Type"),
 
-    REQ_PARAM_ENCRYPT_ERROR("401", "请求参数解密错误"),
+    REQ_PARAM_ENCRYPT_ERROR("4001", "请求参数解密错误"),
 
-    RESP_PARAM_ENCRYPT_ERROR("402", "返回参数加密错误"),
+    RESP_PARAM_ENCRYPT_ERROR("4002", "返回参数加密错误"),
 
     BOX_CONFIG_SETTING_EMPTY("900", "请求环境设置不能为空"),
     ;
